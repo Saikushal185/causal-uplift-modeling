@@ -1,0 +1,7 @@
+pandas>=2.0
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.7
+# Optional — industrial uplift/causal libraries the approach mirrors:
+# econml>=0.15
+# causalml>=0.15
