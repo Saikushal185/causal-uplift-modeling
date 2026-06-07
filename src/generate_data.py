@@ -41,3 +41,24 @@ def make(n: int = 20000, seed: int = 42) -> pd.DataFrame:
     p = np.clip(base + treat * tau, 0.01, 0.99)
     converted = (rng.random(n) < p).astype(int)
 
+    return pd.DataFrame({
+        "recency": recency.round(3), "frequency": frequency,
+        "monetary": monetary.round(2), "is_loyal": is_loyal,
+        "treatment": treat, "converted": converted,
+        "true_uplift": tau.round(4),       # ground truth (not a model input!)
+    })
+
+
+def main() -> None:
+    DATA.mkdir(exist_ok=True)
+    df = make()
+    df.to_csv(DATA / "campaign.csv", index=False)
+    rate_t = df.loc[df.treatment == 1, "converted"].mean()
+    rate_c = df.loc[df.treatment == 0, "converted"].mean()
+    print(f"Wrote {len(df)} rows -> {DATA/'campaign.csv'}")
+    print(f"Avg conversion: treated={rate_t:.3f}  control={rate_c:.3f}  "
+          f"ATE={rate_t - rate_c:+.3f}")
+
+
+if __name__ == "__main__":
+    main()
