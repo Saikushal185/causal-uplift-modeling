@@ -18,3 +18,22 @@ FEATURES = ["recency", "frequency", "monetary", "is_loyal"]
 
 def _base_clf():
     return GradientBoostingClassifier(n_estimators=150, max_depth=3,
+                                      learning_rate=0.05, random_state=0)
+
+
+class SLearner:
+    def __init__(self, base=None):
+        self.model = base or _base_clf()
+
+    def fit(self, X, t, y):
+        self.model.fit(np.column_stack([X, t]), y)
+        return self
+
+    def predict_uplift(self, X):
+        ones = np.column_stack([X, np.ones(len(X))])
+        zeros = np.column_stack([X, np.zeros(len(X))])
+        return self.model.predict_proba(ones)[:, 1] - \
+            self.model.predict_proba(zeros)[:, 1]
+
+
+class TLearner:
