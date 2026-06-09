@@ -37,3 +37,22 @@ class SLearner:
 
 
 class TLearner:
+    def __init__(self, base=None):
+        base = base or _base_clf()
+        self.m_t, self.m_c = clone(base), clone(base)
+
+    def fit(self, X, t, y):
+        self.m_t.fit(X[t == 1], y[t == 1])
+        self.m_c.fit(X[t == 0], y[t == 0])
+        return self
+
+    def predict_uplift(self, X):
+        return self.m_t.predict_proba(X)[:, 1] - self.m_c.predict_proba(X)[:, 1]
+
+
+class XLearner:
+    def __init__(self, base=None):
+        base = base or _base_clf()
+        self.m_t, self.m_c = clone(base), clone(base)
+        self.tau_t = GradientBoostingRegressor(max_depth=3, random_state=0)
+        self.tau_c = GradientBoostingRegressor(max_depth=3, random_state=0)
