@@ -56,3 +56,22 @@ class XLearner:
         self.m_t, self.m_c = clone(base), clone(base)
         self.tau_t = GradientBoostingRegressor(max_depth=3, random_state=0)
         self.tau_c = GradientBoostingRegressor(max_depth=3, random_state=0)
+        self.propensity = 0.5
+
+    def fit(self, X, t, y):
+        self.m_t.fit(X[t == 1], y[t == 1])
+        self.m_c.fit(X[t == 0], y[t == 0])
+        # Imputed treatment effects.
+        d_t = y[t == 1] - self.m_c.predict_proba(X[t == 1])[:, 1]
+        d_c = self.m_t.predict_proba(X[t == 0])[:, 1] - y[t == 0]
+        self.tau_t.fit(X[t == 1], d_t)
+        self.tau_c.fit(X[t == 0], d_c)
+        self.propensity = float(t.mean())
+        return self
+
+    def predict_uplift(self, X):
+        g = self.propensity
+        return g * self.tau_c.predict(X) + (1 - g) * self.tau_t.predict(X)
+
+
+LEARNERS = {"S-learner": SLearner, "T-learner": TLearner, "X-learner": XLearner}
