@@ -42,3 +42,25 @@ def qini_coefficient(y, t, uplift) -> float:
     curve = qini_curve(y, t, uplift)
     n = len(curve)
     rand = np.linspace(0, curve[-1], n)
+    return float(_trapz(curve - rand) / n)
+
+
+def main() -> None:
+    if not DATA.exists():
+        raise SystemExit("Run: python3 src/generate_data.py")
+    df = pd.read_csv(DATA)
+    tr, te = train_test_split(df, test_size=0.3, random_state=42,
+                              stratify=df["treatment"])
+    Xtr, Xte = tr[FEATURES].values, te[FEATURES].values
+
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(6, 5))
+    results = {}
+    for name, Cls in LEARNERS.items():
+        model = Cls().fit(Xtr, tr["treatment"].values, tr["converted"].values)
+        pred = model.predict_uplift(Xte)
+        q = qini_coefficient(te["converted"].values, te["treatment"].values, pred)
+        corr = float(np.corrcoef(pred, te["true_uplift"].values)[0, 1])
+        results[name] = {"qini": round(q, 2), "true_uplift_corr": round(corr, 3)}
+        ax.plot(np.linspace(0, 1, len(Xte)),
+                qini_curve(te["converted"].values, te["treatment"].values, pred),
