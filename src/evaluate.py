@@ -64,3 +64,25 @@ def main() -> None:
         results[name] = {"qini": round(q, 2), "true_uplift_corr": round(corr, 3)}
         ax.plot(np.linspace(0, 1, len(Xte)),
                 qini_curve(te["converted"].values, te["treatment"].values, pred),
+                label=f"{name} (Qini={q:.1f})")
+
+    ax.plot([0, 1], [0, ax.get_ylim()[1]], "k--", alpha=0.5, label="random")
+    ax.set_xlabel("Fraction of population targeted (by predicted uplift)")
+    ax.set_ylabel("Cumulative incremental conversions")
+    ax.set_title("Qini curves — uplift meta-learners")
+    ax.legend()
+    fig.tight_layout()
+    REPORTS.mkdir(exist_ok=True)
+    fig.savefig(REPORTS / "qini_curves.png", dpi=110)
+    (REPORTS / "results.json").write_text(json.dumps(results, indent=2))
+
+    print("Uplift model comparison (held-out):")
+    for name, r in results.items():
+        print(f"  {name:11s} Qini={r['qini']:7.1f}  "
+              f"corr_with_true_uplift={r['true_uplift_corr']:.3f}")
+    best = max(results, key=lambda k: results[k]["true_uplift_corr"])
+    print(f"\nBest ranking model: {best}  -> reports/qini_curves.png")
+
+
+if __name__ == "__main__":
+    main()
