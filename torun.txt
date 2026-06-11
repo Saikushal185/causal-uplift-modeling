@@ -1,0 +1,17 @@
+HOW TO RUN — Causal Inference / Uplift Modeling
+===============================================
+
+1. Install dependencies:
+       pip install -r requirements.txt
+
+2. Generate the synthetic campaign dataset (with known true treatment effects):
+       python3 src/generate_data.py
+
+3. Train + compare the S/T/X-learners (Qini + true-uplift correlation):
+       python3 src/evaluate.py
+
+Outputs:
+   reports/qini_curves.png  — Qini curve comparison
+   reports/results.json     — Qini coefficient + correlation per model
+
+Or just run everything:  ./run.sh
