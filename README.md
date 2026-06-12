@@ -22,3 +22,25 @@ predicted response whenever the effect is heterogeneous.
 ## Demo
 
 ```text
+$ python3 src/generate_data.py
+Avg conversion: treated=0.311  control=0.228  ATE=+0.083
+
+$ python3 src/evaluate.py
+Uplift model comparison (held-out):
+  S-learner   Qini=   82.3  corr_with_true_uplift=0.895
+  T-learner   Qini=   77.3  corr_with_true_uplift=0.829
+  X-learner   Qini=   79.2  corr_with_true_uplift=0.873
+
+Best ranking model: S-learner  -> reports/qini_curves.png
+```
+
+The average treatment effect is +8.3 points, but the value is in the
+*heterogeneity*: the models recover individual uplift at ~0.85–0.90 correlation
+with ground truth, so targeting the top deciles captures far more incremental
+conversions than blanket sending (the gap from the dashed "random" line in
+`reports/qini_curves.png`).
+
+## Methods
+
+| Learner | Idea |
+|---|---|
