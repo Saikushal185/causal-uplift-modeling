@@ -44,3 +44,25 @@ conversions than blanket sending (the gap from the dashed "random" line in
 
 | Learner | Idea |
 |---|---|
+| **S-learner** | One model with treatment as a feature; uplift = f(x,1) − f(x,0) |
+| **T-learner** | Separate treated/control models; uplift = f_t(x) − f_c(x) |
+| **X-learner** | T-learner + impute individual effects, refit, weight by propensity |
+
+## Project structure
+```
+causal-uplift-modeling/
+├── data/campaign.csv       # generated (includes hidden true_uplift column)
+├── src/
+│   ├── generate_data.py    # synthetic campaign w/ known CATE
+│   ├── uplift.py           # S / T / X meta-learners
+│   └── evaluate.py         # Qini curves + true-uplift correlation
+├── reports/                # qini_curves.png, results.json
+├── requirements.txt
+├── torun.txt
+└── license.md
+```
+
+## Run it
+```bash
+./run.sh        # or see torun.txt
+```
