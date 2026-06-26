@@ -66,3 +66,7 @@ causal-uplift-modeling/
 ```bash
 ./run.sh        # or see torun.txt
 ```
+
+## Reproducibility
+
+This project is fully reproducible offline via the included synthetic data generator.
